@@ -13,7 +13,10 @@ module.exports = {
                 .setDescription('ID of the message that contains the picture to use'))
         .addStringOption(option =>
             option.setName('duration')
-                .setDescription('Target duration of the output video in seconds')),
+                .setDescription('Target duration of the output video in seconds'))
+        .addStringOption(option =>
+            option.setName('framerate')
+                .setDescription('Framerate of the output video')),
 
 	async execute(client, interaction) {
         interaction.deferReply();
@@ -32,7 +35,7 @@ module.exports = {
                     file.on("finish", async () => {
                         file.close()
                         try {
-                            await exec(`ffmpeg -y -r 30 -i generated/file.jpg -t 20 -c:v libx265 -x265-params lossless=1 -pix_fmt yuv420p -vf "scale=1080:1920,loop=-1:1" -movflags faststart generated/file.jpg.mp4`)
+                            await exec(`ffmpeg -loop 1 -framerate ${interaction.options.getString('framerate') || 30} -i generated/file.jpg -c:v libx264 -t ${interaction.options.getString('duration') || 20} -pix_fmt yuv420p generated/file.jpg.mp4`)
                             await interaction.followUp('Video generated')
                             
                             const attachment = new AttachmentBuilder('./generated/file.jpg.mp4', { name: 'output.mp4' })
