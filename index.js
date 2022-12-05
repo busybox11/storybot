@@ -18,7 +18,9 @@ client.once(Events.ClientReady, c => {
 
 client.commands = new Collection();
 const commandsPath = path.join(__dirname, 'commands');
+const contextPath = path.join(__dirname, 'context');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+const contextFiles = fs.readdirSync(contextPath).filter(file => file.endsWith('.js'));
 
 for (const file of commandFiles) {
 	const filePath = path.join(commandsPath, file);
@@ -26,9 +28,13 @@ for (const file of commandFiles) {
 	client.commands.set(command.data.name, command);
 }
 
-client.on(Events.InteractionCreate, async interaction => {
-	if (!interaction.isChatInputCommand()) return;
+for (const file of contextFiles) {
+	const filePath = path.join(contextPath, file);
+	const command = require(filePath);
+	client.commands.set(command.data.name, command);
+}
 
+client.on(Events.InteractionCreate, async interaction => {
 	const command = client.commands.get(interaction.commandName);
 
 	if (!command) return;
