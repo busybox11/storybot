@@ -31,14 +31,19 @@ module.exports = {
                     // after download completed close filestream
                     file.on("finish", async () => {
                         file.close()
-                        await exec(`ffmpeg -y -r 30 -i generated/file.jpg -t 20 -c:v libx265 -x265-params lossless=1 -pix_fmt yuv420p -vf "scale=1080:1920,loop=-1:1" -movflags faststart generated/file.jpg.mp4`)
-                        await interaction.followUp('Video generated')
-                        
-                        const attachment = new AttachmentBuilder('./generated/file.jpg.mp4', { name: 'output.mp4' })
-                        await interaction.editReply({ files: [attachment] })
-                        
-                        const interactionMsgObj = await interaction.fetchReply()
-                        await interaction.followUp(interactionMsgObj.attachments.first().url)
+                        try {
+                            await exec(`ffmpeg -y -r 30 -i generated/file.jpg -t 20 -c:v libx265 -x265-params lossless=1 -pix_fmt yuv420p -vf "scale=1080:1920,loop=-1:1" -movflags faststart generated/file.jpg.mp4`)
+                            await interaction.followUp('Video generated')
+                            
+                            const attachment = new AttachmentBuilder('./generated/file.jpg.mp4', { name: 'output.mp4' })
+                            await interaction.editReply({ files: [attachment] })
+                            
+                            const interactionMsgObj = await interaction.fetchReply()
+                            await interaction.followUp(interactionMsgObj.attachments.first().url)
+                        } catch (error) {
+                            console.error(error)
+                            await interaction.followUp(error.toString())
+                        }
                     });
                 });
             })
