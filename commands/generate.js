@@ -35,7 +35,7 @@ module.exports = {
                     file.on("finish", async () => {
                         file.close()
                         try {
-                            await exec(`ffmpeg -loop 1 -framerate ${interaction.options.getString('framerate') || 30} -i generated/file.jpg -c:v libx264 -t ${interaction.options.getString('duration') || 20} -pix_fmt yuv420p generated/file.jpg.mp4`)
+                            await exec(`ffmpeg -y -loop 1 -framerate ${interaction.options.getString('framerate') || 30} -i generated/file.jpg -c:v libx264 -t ${interaction.options.getString('duration') || 20} -pix_fmt yuv420p generated/file.jpg.mp4`)
                             await interaction.followUp('Video generated')
                             
                             const attachment = new AttachmentBuilder('./generated/file.jpg.mp4', { name: 'output.mp4' })
